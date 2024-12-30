@@ -184,8 +184,9 @@ def VARIANTS=[
          osversion:'bookworm',
          arch: 'armhf',
          tag: 1,
+         platform: 'linux/armhf',
          dockerbase:'arm32v7/debian',
-         dockerfile:'Dockerfile.wx32',
+         dockerfile:'Dockerfile.platform.wx32',
          dependencies:[
                 ['libc6'],
                 ['libgcc1'],
@@ -198,8 +199,9 @@ def VARIANTS=[
          osversion:'bookworm',
          arch: 'arm64',
          tag: 1,
+         platform: 'linux/arm64',
          dockerbase:'arm64v8/debian',
-         dockerfile:'Dockerfile.wx32',
+         dockerfile:'Dockerfile.platform.wx32',
          dependencies:[
                 ['libc6'],
                 ['libgcc1'],
@@ -473,7 +475,6 @@ class DockerTask extends Exec{
     def platform
     @Internal
     def tag=1
-    /*def getCommandArgs(dockerBase,osversion,uid,gid,uname,dockerFile,imageName){*/
       def getCommandArgs(uid,gid,uname,imageName){
         return []
     }
@@ -504,7 +505,6 @@ class DockerTask extends Exec{
         if (dockerBase == null) dockerBase=osline
         executable "docker"
         workingDir project.file("docker")
-        /*args(getCommandArgs(dockerBase,osversion,uid,gid,uname,dockerFile,imageName))*/
         args(getCommandArgs(uid,gid,uname,imageName))
         super.exec()
     }
@@ -514,11 +514,6 @@ class DockerBuild extends DockerTask{
     DockerBuild(){
         onlyIf{ !imageExists()}
     }
-    /*def getCommandArgs(dockerBase,osversion,uid,gid,uname,dockerFile,imageName){
-       return ['build', '--build-arg',"OSLINE=$dockerBase",
-               '--build-arg',"OSVERSION=$osversion",
-               '-f', dockerFile,
-               '-t', imageName,'.']*/
     def getCommandArgs(uid,gid,uname,imageName){
       def rt=['build', '--build-arg',"OSLINE=$dockerBase",
              '--build-arg',"OSVERSION=$osversion"]
@@ -531,7 +526,6 @@ class DockerBuild extends DockerTask{
     }
 }
 class DockerPush extends DockerTask{
-    /*def getCommandArgs(dockerBase,osversion,uid,gid,uname,dockerFile,imageName){*/
       def getCommandArgs(uid,gid,uname,imageName){
         return [
                 "push",
